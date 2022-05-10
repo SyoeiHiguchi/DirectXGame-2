@@ -60,7 +60,7 @@ void GameScene::Draw() {
 	/// 3Dモデル描画
 	model_->Draw(worldtransform_, debugCamera_->GetViewProjection(), textureHandle_);
 	{
-		Vector3 p1 = { 0,0,0 };
+		Vector3 p1 = { 0,0,0 };//線描画
 		Vector3 p2 = { 1000,0,0 };
 		Vector4 color = { 100,0,0,255 };
 		PrimitiveDrawer::GetInstance()->DrawLine3d(p1, p2, color);
