@@ -8,6 +8,7 @@
 constexpr auto PI = 3.1415926;
 
 float ConvertToRadians(float Degrees) { return Degrees * (PI / 180.0f); }
+float ConvertToDegrees(float fRadians)  { return fRadians * (180.0f / PI); }
 void ScaleMatrix(WorldTransform& wtf)
 {
 	Matrix4 matScale;//スケーリング行列を宣言
@@ -100,7 +101,10 @@ void GameScene::Initialize() {
 	viewProjection_.eye = { 0,0,-10 };    //カメラ視点座標を設定
 	viewProjection_.target = {10,0,0}; //カメラ注視点を設定
 	viewProjection_.up = {ConvertToRadians(45.0f),ConvertToRadians(45.0f) ,0};
-	
+	viewProjection_.fovAngleY = ConvertToRadians(10.0f); //カメラ垂直方向視野角を設定
+	viewProjection_.aspectRatio = 1.0f;                    //アスペクト比の設定
+	viewProjection_.nearZ = 52.0f;                          //ニアクリップ距離を設定
+	viewProjection_.farZ = 53.0f;//ファークリップ距離を設定
 	viewProjection_.Initialize();//ビュープロジェクションの初期化
 	debugCamera_ = new DebugCamera(1280, 720);
 	AxisIndicator::GetInstance()->SetVisible(true);//軸方向表示の表示を有効化する
@@ -155,6 +159,32 @@ void GameScene::Update() {
 		debugText_->SetPos(50, 90);
 		debugText_->Printf(
 		 "up:(%f,%f,%f)", viewProjection_.up.x, viewProjection_.up.y, viewProjection_.up.z);
+	}
+	// FoV変更処理
+	{
+		 if (input_->PushKey(DIK_UP)) {//上キーで視野角が広がる
+			viewProjection_.fovAngleY += 0.01f;
+			viewProjection_.fovAngleY = min(viewProjection_.fovAngleY, PI);
+		 } else if (input_->PushKey(DIK_DOWN))//下キーで視野角が狭まる
+		 {
+			viewProjection_.fovAngleY -= 0.01f;
+			viewProjection_.fovAngleY = max(viewProjection_.fovAngleY, 0.01f);
+		 }
+		 viewProjection_.UpdateMatrix(); //行列の再計算
+		 debugText_->SetPos(50, 110); //デバック用表示
+		 debugText_->Printf("fovAngeleY(Degree):%f", ConvertToDegrees(viewProjection_.fovAngleY));
+	}
+	//クリップ距離変更設定
+	{
+		 if (input_->PushKey(DIK_UP)) { //上下キーでニアクリップ処理を増減
+			viewProjection_.nearZ += 0.1f;
+		 } else if (input_->PushKey(DIK_DOWN)) //下キーで視野角が狭まる
+		 {
+			viewProjection_.nearZ -= 0.1f;
+		 }
+		 viewProjection_.UpdateMatrix(); //行列の再計算
+		debugText_->SetPos(50, 130); //デバック用表示
+		debugText_->Printf("nearZ:%f", viewProjection_.nearZ);
 	}
 }
 
