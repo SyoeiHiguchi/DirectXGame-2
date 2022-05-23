@@ -3,6 +3,7 @@
 #include <cassert>
 #include "AxisIndicator.h"
 #include "PrimitiveDrawer.h"
+#include <random>
 
 constexpr auto PI = 3.1415926;
 
@@ -35,6 +36,7 @@ void RotationXMatrix(WorldTransform& wtf)
 	matRotX.m[2][1] = -sinf(wtf.rotation_.x);
 	matRotX.m[2][2] = cosf(wtf.rotation_.x);
 	wtf.matWorld_ *= matRotX;
+	wtf.TransferMatrix();//行列の転送
 }
 void RotationYMatrix(WorldTransform& wtf)
 {
@@ -78,25 +80,82 @@ void GameScene::Initialize() {
 	debugText_ = DebugText::GetInstance();
 	textureHandle_ = TextureManager::Load("mario.jpg");
 	model_ = Model::Create();
-	worldtransform_.Initialize();//ワールドトランスフォームの初期化
-	viewprojection_.Initialize();//ビュープロジェクションの初期化
+
+	std::random_device seed_gen;                                 //乱数シード生成器
+	std::mt19937_64 engin(seed_gen());                           //メルセンヌ・ツイスター
+	std::uniform_real_distribution<float> rotDist(0.0f, PI); //乱数範囲（回転軸用）
+	std::uniform_real_distribution<float> posDist(-10.0f, 10.0); //乱数範囲（座標用）
+
+	for (auto& worldtransform : worldtransforms_)
+	{
+		worldtransform.Initialize();//ワールドトランスフォームの初期化
+		worldtransform.scale_ = { 1.0f,1.0f,1.0f };//x,y,z方向のスケーリング設定
+		worldtransform.rotation_ = { rotDist(engin),rotDist(engin),rotDist(engin) };//x,y,z軸周りの回転角を設定
+		worldtransform.translation_ = { posDist(engin),posDist(engin),posDist(engin) };//x,y,z軸周りの平行移動を設定する
+		ScaleMatrix(worldtransform);
+		RotationMatrix(worldtransform);
+		TranslationMatrix(worldtransform);
+	}
+
+	viewProjection_.eye = { 0,0,-10 };    //カメラ視点座標を設定
+	viewProjection_.target = {10,0,0}; //カメラ注視点を設定
+	viewProjection_.up = {ConvertToRadians(45.0f),ConvertToRadians(45.0f) ,0};
+	
+	viewProjection_.Initialize();//ビュープロジェクションの初期化
 	debugCamera_ = new DebugCamera(1280, 720);
 	AxisIndicator::GetInstance()->SetVisible(true);//軸方向表示の表示を有効化する
-	AxisIndicator::GetInstance()->SetTargetViewProjection(&debugCamera_->GetViewProjection());//軸方向が参照するビュープロダクションを指定する
+	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);//軸方向が参照するビュープロダクションを指定する
 	PrimitiveDrawer::GetInstance()->SetViewProjection(&debugCamera_->GetViewProjection());//ライン描画するビュープロジェクションを指定する
-	
-	worldtransform_.scale_ = { 5.0f,5.0f,5.0f };//x,y,z方向のスケーリング設定
-	ScaleMatrix(worldtransform_);
-	float rad = ConvertToRadians(45.0f);
-	worldtransform_.rotation_ = { rad,rad,0.0f };//x,y,z軸周りの回転角を設定
-	RotationMatrix(worldtransform_);
-	worldtransform_.translation_ = { 10.0f,10.0f,10.0f };//x,y,z軸周りの平行移動を設定する
-	TranslationMatrix(worldtransform_);
 
+	
 }
 
 void GameScene::Update() {
 	debugCamera_->Update();//デバッグカメラの更新
+	//視点移動処理
+	{
+		Vector3 move = {0, 0, 0};    //視点の移動ベクトル
+		const float kEyeSpeed = 0.2f; //視点移動の速さ
+		if (input_->PushKey(DIK_W)) { //押した方向で移動ベクトルを変更
+			move = {0, 0, kEyeSpeed};
+		} else if (input_->PushKey(DIK_S)) {
+			move = {0, 0, -kEyeSpeed};
+		}
+		viewProjection_.eye += move; //視点移動（ベクトルの移動）
+		viewProjection_.UpdateMatrix(); //行列の再計算
+		debugText_->SetPos(50, 50);
+		debugText_->Printf(
+		"eye:(%f,%f,%f)", viewProjection_.eye.x, viewProjection_.eye.y, viewProjection_.eye.z);
+	}
+	//注視点移動処理
+	{
+		Vector3 move = {0, 0, 0};       //注視点の移動ベクトル
+		const float kTargetSpeed = 0.2f; //注視点の移動速度
+		if (input_->PushKey(DIK_LEFT)) { //押した方向で移動ベクトルを変更
+			move = {-kTargetSpeed, 0, 0};
+		} else if (input_->PushKey(DIK_RIGHT)) {
+			move = {kTargetSpeed, 0, 0};
+		}
+		viewProjection_.target += move; //注視点移動（ベクトルの加算）
+		viewProjection_.UpdateMatrix(); //行列の再計算
+		debugText_->SetPos(50, 70);
+		debugText_->Printf(
+		"target:(%f,%f,%f)", viewProjection_.target.x, viewProjection_.target.y,
+		viewProjection_.target.z);
+	}
+	//上方向の回転
+	{
+		const float kUpRotSpeed = 0.05f;//上方向の回転の速さ[ラジアン/fream]
+		if (input_->PushKey(DIK_SPACE)) { //押した方向で移動ベクトルを変更
+			viewAngel += kUpRotSpeed;
+			viewAngel = fmodf(viewAngel, PI * 2.0f);//2πを超えたら0に戻す
+		}
+		viewProjection_.up = {cosf(viewAngel), sinf(viewAngel),0.0f};//上方向ベクトルを計算(半径１の円周上の座標)   
+		viewProjection_.UpdateMatrix();//行列の再計算
+		debugText_->SetPos(50, 90);
+		debugText_->Printf(
+		 "up:(%f,%f,%f)", viewProjection_.up.x, viewProjection_.up.y, viewProjection_.up.z);
+	}
 }
 
 void GameScene::Draw() {
@@ -126,7 +185,12 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	/// 3Dモデル描画
-	model_->Draw(worldtransform_, debugCamera_->GetViewProjection(), textureHandle_);
+	for (auto& worldtransform : worldtransforms_)
+	{
+		//model_->Draw(worldtransform, debugCamera_->GetViewProjection(), textureHandle_);
+		model_->Draw(worldtransform,viewProjection_, textureHandle_);
+	}
+	
 	{
 		Vector3 p1 = { 0,0,0 };//線描画
 		Vector3 p2 = { 1000,0,0 };
