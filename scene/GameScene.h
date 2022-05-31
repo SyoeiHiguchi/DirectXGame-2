@@ -18,6 +18,17 @@
 class GameScene {
 
   public: // メンバ関数
+	  enum PartId {
+		  Root,  //大本
+		  Spine, //脊髄
+		  Chest, //胸
+		  Head,  //頭
+		  Arml,  //左腕
+		  ArmR,  //右腕
+		  Hip,   //尻
+		  LegL,  //左足
+		  LegR,  //右足
+	  };
 	/// <summary>
 	/// コンストクラタ
 	/// </summary>
@@ -50,7 +61,7 @@ class GameScene {
 	DebugText* debugText_ = nullptr;
 	uint32_t textureHandle_ = 0;//テクスチャハンドル
 	Model* model_ = nullptr;//3dモデル
-	WorldTransform worldtransforms_[100];//ワールドトランスフォーム
+	WorldTransform worldTransforms_[LegR + 1];//ワールドトランスフォーム
 	ViewProjection viewProjection_;//ビュープロジェクション
 	DebugCamera* debugCamera_ = nullptr;//デバッグカメラ
 	float viewAngel = 0.0f;//カメラ上方向の角度
