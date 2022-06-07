@@ -1,5 +1,5 @@
 #include "Player.h"
-
+#include "Matrix.h"
 
 
 void Player::Initialize(Model* model, uint32_t textureHandle)
@@ -38,13 +38,44 @@ void Player::Update()
 	const float kMoveLimitY = 10;
 	worldTransform_.translation_.x = min(kMoveLimitX, max(worldTransform_.translation_.x, -kMoveLimitX));
 	worldTransform_.translation_.y = min(kMoveLimitY, max(worldTransform_.translation_.y, -kMoveLimitY));
+	Rotate();
 	//行列更新
 	MyMatrix::MatrixUpdate(worldTransform_);
 	debugText_->Printf(
-		"transform:(%f,%f,%f)", worldTransform_.translation_.x,worldTransform_.translation_.y,worldTransform_.translation_.z);	
+		"transform:(%f,%f,%f)", worldTransform_.translation_.x,worldTransform_.translation_.y,worldTransform_.translation_.z);
+	//キャラクター攻撃処理
+	Attack();
+	if (bullet_) {
+		bullet_->Update();
+	}
 }
 
 void Player::Draw(ViewProjection viewprojection)
 {
 	model_->Draw(worldTransform_, viewprojection, textureHandle_);
+	if (bullet_) {
+		bullet_->Draw(viewprojection);
+	}
+}
+
+void Player::Attack()
+{
+	if (input_->PushKey(DIK_SPACE)) {
+		//弾を生成し初期化
+		PlayerBullet* newBullet = new PlayerBullet();
+		newBullet->Initialize(model_, worldTransform_.translation_);
+		//弾を登録する
+		bullet_ = newBullet;
+	}
+}
+
+void Player::Rotate()
+{
+	//キャラクターの移動ベクトル
+	Vector3 rot = { 0,0,0 };
+	//移動ベクトルを変更する処理
+	if (input_->PushKey(DIK_LEFT))  rot.y = 0.5;
+	if (input_->PushKey(DIK_RIGHT)) rot.y = -0.5;
+	//座標移動
+	worldTransform_.rotation_ = rot;
 }
