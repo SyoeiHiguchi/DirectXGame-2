@@ -65,5 +65,19 @@ namespace MyMatrix
 		MatrixTranslation(wtf);
 		wtf.TransferMatrix();//çsóÒÇÃì]ëó
 	}
+	
+	inline Vector3 VectorProduct(Vector3 vector, WorldTransform& wtf) {
+		Vector3 vec = { 0,0,0 };
+		vec.x += vector.x * wtf.matWorld_.m[0][0];
+		vec.x += vector.y * wtf.matWorld_.m[1][0];
+		vec.x += vector.z * wtf.matWorld_.m[2][0];
+		vec.y += vector.x * wtf.matWorld_.m[0][1];
+		vec.y += vector.y * wtf.matWorld_.m[1][1];
+		vec.y += vector.z * wtf.matWorld_.m[2][1];
+		vec.z += vector.x * wtf.matWorld_.m[0][2];
+		vec.z += vector.y * wtf.matWorld_.m[1][2];
+		vec.z += vector.z * wtf.matWorld_.m[2][2];
+		return vec;
+	}
 }
 
