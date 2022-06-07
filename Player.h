@@ -5,6 +5,7 @@
 #include <2d/DebugText.h>
 #include <assert.h>
 #include <PlayerBullet.h>
+#include <memory>
 /// <summary>
 /// 自キャラ
 /// </summary>
@@ -39,7 +40,7 @@ private:
 	//デバッグテキスト
 	DebugText* debugText_ = nullptr;
 	//弾
-	PlayerBullet* bullet_ = nullptr;
+	std::list<std::unique_ptr<PlayerBullet>> bullets_;
 
 	void Rotate();
 	

@@ -45,16 +45,16 @@ void Player::Update()
 		"transform:(%f,%f,%f)", worldTransform_.translation_.x,worldTransform_.translation_.y,worldTransform_.translation_.z);
 	//ƒLƒƒƒ‰ƒNƒ^[UŒ‚ˆ—
 	Attack();
-	if (bullet_) {
-		bullet_->Update();
+	for (auto& bullet : bullets_) {
+		bullet->Update();
 	}
 }
 
 void Player::Draw(ViewProjection viewprojection)
 {
 	model_->Draw(worldTransform_, viewprojection, textureHandle_);
-	if (bullet_) {
-		bullet_->Draw(viewprojection);
+	for (auto& bullet : bullets_) {
+		bullet->Draw(viewprojection);
 	}
 }
 
@@ -62,10 +62,10 @@ void Player::Attack()
 {
 	if (input_->PushKey(DIK_SPACE)) {
 		//’e‚ğ¶¬‚µ‰Šú‰»
-		PlayerBullet* newBullet = new PlayerBullet();
+		std::unique_ptr<PlayerBullet> newBullet = std::make_unique<PlayerBullet>();
 		newBullet->Initialize(model_, worldTransform_.translation_);
 		//’e‚ğ“o˜^‚·‚é
-		bullet_ = newBullet;
+		bullets_.push_back(std::move(newBullet));
 	}
 }
 
