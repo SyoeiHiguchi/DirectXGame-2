@@ -15,7 +15,6 @@ GameScene::GameScene() {}
 
 GameScene::~GameScene() {
 	delete model_;
-	delete player_;
 	delete debugCamera_;
 }
 
@@ -34,9 +33,11 @@ void GameScene::Initialize() {
 	std::uniform_real_distribution<float> posDist(-10.0f, 10.0); //乱数範囲（座標用）
 
 	
-	player_ = new Player();//自キャラの生成
+	player_ = std::make_unique<Player>();//自キャラの生成
 	player_->Initialize(model_,textureHandle_);//プレイヤーの初期化
 
+	enemy_ = std::make_unique<Enemy>();//エネミーの生成
+	enemy_->Initialize(model_, textureHandle_);//エネミーの初期化
 
 	//viewProjection_.eye = { 0,0,-50 };    //カメラ視点座標を設定
 	//viewProjection_.target = {10,0,0}; //カメラ注視点を設定
@@ -142,6 +143,7 @@ void GameScene::Update() {
 	//}
 	
 	player_->Update();
+	enemy_->Update();
 }
 
 void GameScene::Draw() {
@@ -172,6 +174,7 @@ void GameScene::Draw() {
 	/// </summary>
 	/// 3Dモデル描画
 	player_->Draw(viewProjection_);
+	enemy_->Draw(viewProjection_);
 
 	{
 		Vector3 p1 = { 0,0,0 };//線描画

@@ -10,6 +10,8 @@
 #include "WorldTransform.h"
 #include "DebugCamera.h"
 #include "Player.h"
+#include "Enemy.h"
+#include <memory>
 
 
 
@@ -54,7 +56,8 @@ class GameScene {
 	ViewProjection viewProjection_;//ビュープロジェクション
 	DebugCamera* debugCamera_ = nullptr;//デバッグカメラ
 	float viewAngel = 0.0f;//カメラ上方向の角度
-	Player* player_ = nullptr;
+	std::unique_ptr<Player> player_ = nullptr;
+	std::unique_ptr<Enemy> enemy_ = nullptr;
 	bool isDubugCameraActive_ = false;//デバッグカメラを有効化
 
 	/// <summary>

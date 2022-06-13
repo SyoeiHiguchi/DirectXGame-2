@@ -91,4 +91,3 @@ void Player::Rotate()
 	//À•WˆÚ“®
 	worldTransform_.rotation_ = rot;
 }
-
