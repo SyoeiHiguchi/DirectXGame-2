@@ -6,6 +6,12 @@
 #include <assert.h>
 #include <PlayerBullet.h>
 #include <memory>
+
+enum class Phase {
+	Approach,//接近する
+	Leave,//離脱する
+};
+
 class Enemy
 {
 public:
@@ -28,5 +34,8 @@ private:
 	Model* model_ = nullptr;
 	//テクスチャハンドル
 	uint32_t textureHandle_ = 0u;
+
+	//フェーズ
+	Phase phase_ = Phase::Approach;
 };
 

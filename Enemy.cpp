@@ -20,8 +20,24 @@ void Enemy::Initialize(Model* model, uint32_t textureHandle)
 
 void Enemy::Update()
 {
+	switch (phase_)
+	{
+	case Phase::Approach:
+		//移動ベクトルを加算
+		worldTransform_.translation_.z -= 0.1;
+		//規定の位置に到達したら離脱
+		if (worldTransform_.translation_.z < -10.0f) {
+			phase_ = Phase::Leave;
+		}
+		break;
+	default:
+		//移動(ベクトルを加算)
+		worldTransform_.translation_ += Vector3(4,1,3);
+		break;
+	}
+
 	//行列更新
-	worldTransform_.translation_.z -= 0.1;
+	
 	MyMatrix::MatrixUpdate(worldTransform_);
 }
 
