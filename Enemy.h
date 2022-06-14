@@ -34,8 +34,12 @@ private:
 	Model* model_ = nullptr;
 	//テクスチャハンドル
 	uint32_t textureHandle_ = 0u;
-
 	//フェーズ
 	Phase phase_ = Phase::Approach;
+
+	void Approach();
+	void Leave();
+
+	static void(Enemy::*spFuncTable[])();
 };
 
