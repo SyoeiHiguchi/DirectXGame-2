@@ -2,7 +2,8 @@
 #include "Matrix.h"
 #include "EnemyStateApproach.h"
 #include "EnemyStateLeave.h"
-
+#include "Player.h"
+#include <cassert>
 
 void Enemy::Initialize(Model* model)
 {
@@ -20,7 +21,6 @@ void Enemy::Initialize(Model* model)
 	MyMatrix::MatrixRotation(worldTransform_);
 	MyMatrix::MatrixTranslation(worldTransform_);
 	state_ = new EnemyStateApproach();
-	ApproachPhaseInitialize();
 }
 
 
@@ -65,9 +65,15 @@ void Enemy::Move(Vector3 vec)
 
 void Enemy::Fire()
 {
+	assert(player_);
 	//弾の速度
 	const float kBulletSpeed = 1.0f;
-	Vector3 velocity(0, kBulletSpeed, kBulletSpeed);
+	Vector3 PlayerPos = player_->GetTransform();
+	Vector3 MyPos = this->GetTransform();
+	
+	Vector3 velocity = PlayerPos - MyPos;
+	velocity.normalize();
+	velocity *= kBulletSpeed;
 
 	//弾を生成し初期化
 	std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
@@ -99,6 +105,17 @@ void Enemy::BulettTimeReset()
 void Enemy::TimeListReset()
 {
 	timedCalls_.clear();
+}
+
+Vector3 Enemy::GetTransform()
+{
+	//ワールド座標を入れる変数
+	Vector3 worldPos;
+	//ワールド行列の平行成分取得
+	worldPos.x = worldTransform_.matWorld_.m[3][0];
+	worldPos.y = worldTransform_.matWorld_.m[3][1];
+	worldPos.z = worldTransform_.matWorld_.m[3][2];
+	return worldPos;
 }
 
 Enemy::~Enemy()

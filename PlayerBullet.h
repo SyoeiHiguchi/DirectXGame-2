@@ -22,6 +22,11 @@ public:
 	///  描画
 	/// </summary>
 	void Draw(const ViewProjection& viewProjection);
+	/// <summary>
+	/// 座標のゲッター
+	/// </summary>
+	/// <returns></returns>
+	Vector3 GetTransform();
 
 	bool IsDead() const { return isDead_; }
 private:

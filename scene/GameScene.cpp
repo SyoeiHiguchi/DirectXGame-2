@@ -26,12 +26,6 @@ void GameScene::Initialize() {
 	debugText_ = DebugText::GetInstance();
 	textureHandle_ = TextureManager::Load("mario.jpg");
 	model_ = Model::Create();
-
-	std::random_device seed_gen;                                 //乱数シード生成器
-	std::mt19937_64 engin(seed_gen());                           //メルセンヌ・ツイスター
-	std::uniform_real_distribution<float> rotDist(0.0f, PI); //乱数範囲（回転軸用）
-	std::uniform_real_distribution<float> posDist(-10.0f, 10.0); //乱数範囲（座標用）
-
 	
 	player_ = std::make_unique<Player>();//自キャラの生成
 	player_->Initialize(model_,textureHandle_);//プレイヤーの初期化
@@ -51,8 +45,8 @@ void GameScene::Initialize() {
 	AxisIndicator::GetInstance()->SetVisible(true);//軸方向表示の表示を有効化する
 	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);//軸方向が参照するビュープロダクションを指定する
 	PrimitiveDrawer::GetInstance()->SetViewProjection(&debugCamera_->GetViewProjection());//ライン描画するビュープロジェクションを指定する
-	
-	
+
+	enemy_->SetPlayer(player_.get());	
 }
 
 void GameScene::Update() {

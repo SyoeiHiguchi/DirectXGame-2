@@ -9,6 +9,8 @@
 #include "TimedCall.h"
 
 class BaseEnemyState;
+//自キャラの前方宣言
+class Player;
 
 
 enum class Phase {
@@ -24,6 +26,10 @@ public:
 	/// </summary>
 	void Initialize(Model* model);
 	/// <summary>
+	///	接近フェーズ初期化
+	/// </summary>
+	void ApproachPhaseInitialize();
+	/// <summary>
 	/// 更新
 	/// </summary>
 	void Update();
@@ -36,34 +42,32 @@ public:
 	/// </summary>
 	void Move(Vector3 vec);
 	/// <summary>
-	///	座標のgetter
-	/// </summary>
-	Vector3 Tramsform() { return worldTransform_.translation_; };
-	/// <summary>
-	///	玉発射
-	/// </summary>
-	void Fire();
-	/// <summary>
-	///	接近フェーズ初期化
-	/// </summary>
-	void ApproachPhaseInitialize();
-
-	/// <summary>
 	///	状態を変更する
 	/// </summary>
 	void ChangeState(BaseEnemyState* newState);
-
 	/// <summary>
 	/// 弾を発射し、タイマーをリセットする関数
 	/// </summary>
 	void BulettTimeReset();
-
 	/// <summary>
 	/// タイマーのlistをリセットする関数
 	/// </summary>
 	void TimeListReset();
+	/// <summary>
+	/// プレイヤーのセッター
+	/// </summary>
+	void SetPlayer(Player* player) { player_ = player; }
+	/// 座標のゲッター
+	/// </summary>
+	/// <returns></returns>
+	Vector3 GetTransform();
 
 	~Enemy();//デストラクタ
+private:
+	/// <summary>
+	///	玉発射
+	/// </summary>
+	void Fire();
 private:
 	//ワールド変換データ
 	WorldTransform worldTransform_;
@@ -71,11 +75,15 @@ private:
 	Model* model_ = nullptr;
 	//テクスチャハンドル
 	uint32_t textureHandle_ = 0u;
-
+	//自キャラ
+	Player* player_ = nullptr;
+	
+	//状態
 	BaseEnemyState* state_;
 	
 	//弾
 	std::list<std::unique_ptr<EnemyBullet>> bullets_;
+
 	//発射感覚
 	static const int kFireInterval = 60;
 	//発射タイマー

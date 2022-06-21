@@ -24,6 +24,11 @@ public:
 	///	描画
 	/// </summary>
 	void Draw(ViewProjection viewprojection);
+	/// <summary>
+	/// 座標のゲッター
+	/// </summary>
+	/// <returns></returns>
+	Vector3 GetTransform();
 private:
 	/// <summary>
 	///	描画
