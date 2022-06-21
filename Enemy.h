@@ -7,6 +7,9 @@
 #include <memory>
 #include "EnemyBullet.h"
 
+class BaseEnemyState;
+
+
 enum class Phase {
 	Approach,//接近する
 	Leave,//離脱する
@@ -45,6 +48,11 @@ public:
 	void ApproachPhaseInitialize();
 	void ApproachPhaseUpdate();
 
+	/// <summary>
+	///	
+	/// </summary>
+	void ChangeState(BaseEnemyState* newState);
+
 	~Enemy();//デストラクタ
 private:
 	//ワールド変換データ
@@ -54,8 +62,8 @@ private:
 	//テクスチャハンドル
 	uint32_t textureHandle_ = 0u;
 
-	//EnemyState* state_;
-	// 
+	BaseEnemyState* state_;
+	
 	//弾
 	std::list<std::unique_ptr<EnemyBullet>> bullets_;
 	//発射感覚
@@ -66,6 +74,6 @@ private:
 	//フェーズ
 	Phase phase_ = Phase::Approach;
 
-	static void(Enemy::*spFuncTable[])();
+	//static void(Enemy::*spFuncTable[])();
 };
 

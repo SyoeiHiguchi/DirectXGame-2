@@ -58,6 +58,9 @@
     <Filter Include="ヘッダー ファイル\Enemy">
       <UniqueIdentifier>{a9d912d2-153c-4ef5-96d1-d2d76945e9b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\Player">
+      <UniqueIdentifier>{2b17b65c-a82c-43be-b6ae-c8d43c6281a8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -85,6 +88,15 @@
       <Filter>ソース ファイル\Player</Filter>
     </ClCompile>
     <ClCompile Include="EnemyBullet.cpp">
+      <Filter>ソース ファイル\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseEnemyState.cpp">
+      <Filter>ソース ファイル\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyStateApproach.cpp">
+      <Filter>ソース ファイル\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyStateLeave.cpp">
       <Filter>ソース ファイル\Enemy</Filter>
     </ClCompile>
   </ItemGroup>
@@ -170,20 +182,29 @@
     <ClInclude Include="3d\PrimitiveDrawer.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Matrix.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerBullet.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Enemy.h">
       <Filter>ヘッダー ファイル\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="EnemyBullet.h">
       <Filter>ヘッダー ファイル\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseEnemyState.h">
+      <Filter>ヘッダー ファイル\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyStateApproach.h">
+      <Filter>ヘッダー ファイル\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyStateLeave.h">
+      <Filter>ヘッダー ファイル\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix.h">
+      <Filter>ヘッダー ファイル\math</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>ヘッダー ファイル\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerBullet.h">
+      <Filter>ヘッダー ファイル\Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

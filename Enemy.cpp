@@ -1,5 +1,7 @@
 #include "Enemy.h"
 #include "Matrix.h"
+#include "EnemyStateApproach.h"
+#include "EnemyStateLeave.h"
 
 void Enemy::Initialize(Model* model)
 {
@@ -18,6 +20,7 @@ void Enemy::Initialize(Model* model)
 	MyMatrix::MatrixTranslation(worldTransform_);
 	//state_ = new EnemyStateApproach();
 	ApproachPhaseInitialize();
+	state_ = new EnemyStateApproach();
 }
 
 
@@ -38,6 +41,7 @@ void Enemy::Update()
 	//	worldTransform_.translation_ += Vector3(4, 1, 3);
 	//	break;
 	//}
+	state_->Action(this);
 	ApproachPhaseUpdate();
 	//çsóÒçXêV
 	MyMatrix::MatrixUpdate(worldTransform_);
@@ -57,7 +61,7 @@ void Enemy::Draw(ViewProjection viewprojection)
 
 void Enemy::Move(Vector3 vec)
 {
-	worldTransform_.translation_ = vec;
+	worldTransform_.translation_ += vec;
 	MyMatrix::MatrixUpdate(worldTransform_);
 }
 
@@ -97,6 +101,13 @@ void Enemy::ApproachPhaseUpdate()
 	}
 }
 
+void Enemy::ChangeState(BaseEnemyState* newState)
+{
+	delete state_;
+	state_ = newState;
+}
+
 Enemy::~Enemy()
 {
+	delete state_;
 }
