@@ -3,6 +3,7 @@
 #include "EnemyStateApproach.h"
 #include "EnemyStateLeave.h"
 
+
 void Enemy::Initialize(Model* model)
 {
 	//NULLポインタチェック
@@ -18,36 +19,33 @@ void Enemy::Initialize(Model* model)
 	MyMatrix::MatrixScale(worldTransform_);
 	MyMatrix::MatrixRotation(worldTransform_);
 	MyMatrix::MatrixTranslation(worldTransform_);
-	//state_ = new EnemyStateApproach();
-	ApproachPhaseInitialize();
 	state_ = new EnemyStateApproach();
+	ApproachPhaseInitialize();
 }
 
 
 void Enemy::Update()
 {
-	//switch (phase_)
-	//{
-	//case Phase::Approach:
-	//	//移動ベクトルを加算
-	//	worldTransform_.translation_.z -= 0.1;
-	//	//規定の位置に到達したら離脱
-	//	if (worldTransform_.translation_.z < -10.0f) {
-	//		phase_ = Phase::Leave;
-	//	}
-	//	break;
-	//default:
-	//	//移動(ベクトルを加算)
-	//	worldTransform_.translation_ += Vector3(4, 1, 3);
-	//	break;
-	//}
+	//デスフラグの立った弾を削除
+	bullets_.remove_if([](std::unique_ptr<EnemyBullet>& bullet) {
+		return bullet->IsDead();
+		});
+
 	state_->Action(this);
-	ApproachPhaseUpdate();
 	//行列更新
 	MyMatrix::MatrixUpdate(worldTransform_);
 
 	for (auto& bullet : bullets_) {
 		bullet->Update();
+	}
+
+	//終了したタイマーを削除
+	timedCalls_.remove_if([](std::unique_ptr<TimedCall>& timedcall) {
+		return timedcall->IsFinished();
+		});
+	//範囲forで全要素について回す
+	for (auto& timedcall : timedCalls_) {
+		timedcall->Update();
 	}
 }
 
@@ -65,13 +63,6 @@ void Enemy::Move(Vector3 vec)
 	MyMatrix::MatrixUpdate(worldTransform_);
 }
 
-
-//void Enemy::ChangeState(EnemyState* newState)
-//{
-//	delete state_;
-//	state_ = newState;
-//}
-
 void Enemy::Fire()
 {
 	//弾の速度
@@ -87,24 +78,27 @@ void Enemy::Fire()
 
 void Enemy::ApproachPhaseInitialize()
 {
-	//発射タイマーを初期化
-	fireTimer_ = 60;
-}
-
-void Enemy::ApproachPhaseUpdate()
-{
-	fireTimer_--;
-	if (fireTimer_ < 0) {
-		//弾を発射
-		Fire();
-		fireTimer_ = kFireInterval;
-	}
+	BulettTimeReset();
 }
 
 void Enemy::ChangeState(BaseEnemyState* newState)
 {
 	delete state_;
 	state_ = newState;
+}
+
+void Enemy::BulettTimeReset()
+{
+	//弾を発射
+	Fire();
+	//発射タイマーをセットする
+	timedCalls_.push_back(std::make_unique<TimedCall>(
+		std::bind(&Enemy::BulettTimeReset, this), 60));
+}
+
+void Enemy::TimeListReset()
+{
+	timedCalls_.clear();
 }
 
 Enemy::~Enemy()

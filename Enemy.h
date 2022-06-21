@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <memory>
 #include "EnemyBullet.h"
+#include "TimedCall.h"
 
 class BaseEnemyState;
 
@@ -46,12 +47,21 @@ public:
 	///	接近フェーズ初期化
 	/// </summary>
 	void ApproachPhaseInitialize();
-	void ApproachPhaseUpdate();
 
 	/// <summary>
-	///	
+	///	状態を変更する
 	/// </summary>
 	void ChangeState(BaseEnemyState* newState);
+
+	/// <summary>
+	/// 弾を発射し、タイマーをリセットする関数
+	/// </summary>
+	void BulettTimeReset();
+
+	/// <summary>
+	/// タイマーのlistをリセットする関数
+	/// </summary>
+	void TimeListReset();
 
 	~Enemy();//デストラクタ
 private:
@@ -74,6 +84,7 @@ private:
 	//フェーズ
 	Phase phase_ = Phase::Approach;
 
-	//static void(Enemy::*spFuncTable[])();
+	//時限発動のリスト
+	std::list<std::unique_ptr<TimedCall>> timedCalls_;
 };
 
