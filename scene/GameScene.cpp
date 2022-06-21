@@ -37,7 +37,7 @@ void GameScene::Initialize() {
 	player_->Initialize(model_,textureHandle_);//プレイヤーの初期化
 
 	enemy_ = std::make_unique<Enemy>();//エネミーの生成
-	enemy_->Initialize(model_, textureHandle_);//エネミーの初期化
+	enemy_->Initialize(model_);//エネミーの初期化
 
 	//viewProjection_.eye = { 0,0,-50 };    //カメラ視点座標を設定
 	//viewProjection_.target = {10,0,0}; //カメラ注視点を設定

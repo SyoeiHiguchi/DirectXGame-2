@@ -1,12 +1,12 @@
-#include "PlayerBullet.h"
+#include "EnemyBullet.h"
 #include "Matrix.h"
 
-void PlayerBullet::Initialize(Model* model, const Vector3& position, const Vector3 velocity)
+void EnemyBullet::Initialize(Model* model, const Vector3& position, const Vector3 velocity)
 {
 	assert(model);
 	model_ = model;
 	//テクスチャの読み込み
-	textureHandle_ = TextureManager::Load("自機の弾.png");
+	textureHandle_ = TextureManager::Load("敵の弾.png");
 	//ワールド変換の初期化
 	worldTransform_.scale_ = { 1.0f,1.0f,1.0f };//x,y,z方向のスケーリング設定
 	worldTransform_.rotation_ = { 0,0,0 };//x,y,z軸周りの回転角を設定
@@ -21,7 +21,7 @@ void PlayerBullet::Initialize(Model* model, const Vector3& position, const Vecto
 	velocity_ = velocity;
 }
 
-void PlayerBullet::Update()
+void EnemyBullet::Update()
 {
 	worldTransform_.translation_ += velocity_;
 	MyMatrix::MatrixUpdate(worldTransform_);
@@ -30,7 +30,8 @@ void PlayerBullet::Update()
 	}
 }
 
-void PlayerBullet::Draw(const ViewProjection& viewProjection)
+void EnemyBullet::Draw(const ViewProjection& viewProjection)
 {
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
 }
+

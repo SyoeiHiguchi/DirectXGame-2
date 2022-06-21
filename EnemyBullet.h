@@ -4,31 +4,25 @@
 #include <input/Input.h>
 #include <2d/DebugText.h>
 #include <assert.h>
-#include "PlayerBullet.h"
-#include <memory>
-/// <summary>
-/// 自キャラ
-/// </summary>
-class Player
-{
+class EnemyBullet{
 public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(Model* model,uint32_t textureHandle);
+	/// <param name = "model">モデル</pram>
+	/// <param name = "position">初期座標</pram>
+	void Initialize(Model* model, const Vector3& position, const Vector3 velocity);
 	/// <summary>
-	/// 更新
+	///  更新
 	/// </summary>
 	void Update();
 	/// <summary>
-	///	描画
+	///  描画
 	/// </summary>
-	void Draw(ViewProjection viewprojection);
+	void Draw(const ViewProjection& viewProjection);
+
+	bool IsDead() const { return isDead_; }
 private:
-	/// <summary>
-	///	描画
-	/// </summary>
-	void Attack();
 	//ワールド変換データ
 	WorldTransform worldTransform_;
 	//モデル
@@ -39,10 +33,13 @@ private:
 	Input* input_ = nullptr;
 	//デバッグテキスト
 	DebugText* debugText_ = nullptr;
-	//弾
-	std::list<std::unique_ptr<PlayerBullet>> bullets_;
-
-	void Rotate();
-	
+	//速度
+	Vector3 velocity_;
+	//寿命
+	static const int32_t kLifeTime = 60 * 5;
+	//デスタイマー
+	int32_t deathTimer_ = kLifeTime;
+	//デスフラグ
+	bool isDead_ = false;
 };
 
