@@ -1,5 +1,6 @@
 #include "EnemyBullet.h"
 #include "Matrix.h"
+#include <cmath>
 
 void EnemyBullet::Initialize(Model* model, const Vector3& position, const Vector3 velocity)
 {
@@ -8,8 +9,16 @@ void EnemyBullet::Initialize(Model* model, const Vector3& position, const Vector
 	//テクスチャの読み込み
 	textureHandle_ = TextureManager::Load("敵の弾.png");
 	//ワールド変換の初期化
-	worldTransform_.scale_ = { 1.0f,1.0f,1.0f };//x,y,z方向のスケーリング設定
+	worldTransform_.scale_ = { 0.5f,0.5f,3.0f };//x,y,z方向のスケーリング設定
 	worldTransform_.rotation_ = { 0,0,0 };//x,y,z軸周りの回転角を設定
+	//y軸周り角度(θy)
+	worldTransform_.rotation_.y = std::atan2(velocity.x, velocity.z);
+	//横軸方向の長さをもとめる
+	Vector3 vel = velocity;
+	vel.y = 0;
+	//ｙ軸周り角度を求める(θx)
+	worldTransform_.translation_.x = std::atan2(velocity.z, vel.length());
+
 	worldTransform_.translation_ = { 0,0,0 };//x,y,z軸周りの平行移動を設定する
 	worldTransform_.Initialize();
 	MyMatrix::MatrixScale(worldTransform_);
