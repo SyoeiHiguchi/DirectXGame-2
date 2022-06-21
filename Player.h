@@ -24,6 +24,10 @@ public:
 	///	描画
 	/// </summary>
 	void Draw(ViewProjection viewprojection);
+	/// <summary>
+	/// 座標のゲッター
+	/// </summary>
+	Vector3 GetWorldPos();
 private:
 	/// <summary>
 	///	描画

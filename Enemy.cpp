@@ -1,5 +1,6 @@
 #include "Enemy.h"
 #include "Matrix.h"
+#include "Player.h"
 
 void Enemy::Initialize(Model* model)
 {
@@ -72,7 +73,12 @@ void Enemy::Fire()
 {
 	//弾の速度
 	const float kBulletSpeed = 1.0f;
-	Vector3 velocity(0, kBulletSpeed, kBulletSpeed);
+	Vector3 PlayerPos = player_->GetWorldPos();
+	Vector3 MyPos = this->GetWorldPos();
+
+	Vector3 velocity = PlayerPos - MyPos;
+	velocity.normalize();
+	velocity *= kBulletSpeed;
 
 	//弾を生成し初期化
 	std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
@@ -95,6 +101,18 @@ void Enemy::ApproachPhaseUpdate()
 		Fire();
 		fireTimer_ = kFireInterval;
 	}
+}
+
+Vector3 Enemy::GetWorldPos()
+{
+	//ワールド座標を入れる変数
+	Vector3 worldPos;
+	//ワールド行列の平行移動成分取得
+	worldPos.x = worldTransform_.matWorld_.m[3][0];
+	worldPos.y = worldTransform_.matWorld_.m[3][1];
+	worldPos.z = worldTransform_.matWorld_.m[3][2];
+
+	return worldPos;
 }
 
 Enemy::~Enemy()

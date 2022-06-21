@@ -53,6 +53,8 @@ void GameScene::Initialize() {
 	PrimitiveDrawer::GetInstance()->SetViewProjection(&debugCamera_->GetViewProjection());//ライン描画するビュープロジェクションを指定する
 	
 	
+	enemy_->SetPlayer(player_.get());
+	
 }
 
 void GameScene::Update() {
