@@ -15,7 +15,7 @@ void Player::Initialize(Model* model, uint32_t textureHandle)
 	//ワールド変換の初期化
 	worldTransform_.scale_ = { 1.0f,1.0f,1.0f };//x,y,z方向のスケーリング設定
 	worldTransform_.rotation_ = { 0,0,0};//x,y,z軸周りの回転角を設定
-	worldTransform_.translation_ = { 0,0,0 };//x,y,z軸周りの平行移動を設定する
+	worldTransform_.translation_ = { 0,0,-10.0f };//x,y,z軸周りの平行移動を設定する
 	worldTransform_.Initialize();
 	MyMatrix::MatrixScale(worldTransform_);
 	MyMatrix::MatrixRotation(worldTransform_);
@@ -61,6 +61,10 @@ void Player::Draw(ViewProjection viewprojection)
 	for (auto& bullet : bullets_) {
 		bullet->Draw(viewprojection);
 	}
+}
+
+void Player::OnCollision()
+{
 }
 
 Vector3 Player::GetTransform()

@@ -35,6 +35,11 @@ void PlayerBullet::Draw(const ViewProjection& viewProjection)
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
 }
 
+void PlayerBullet::OnCollision()
+{
+	isDead_ = true;
+}
+
 Vector3 PlayerBullet::GetTransform()
 {
 	//ƒ[ƒ‹ƒhÀ•W‚ğ“ü‚ê‚é•Ï”

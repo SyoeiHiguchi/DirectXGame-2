@@ -54,6 +54,15 @@ public:
 	/// </summary>
 	void TimeListReset();
 	/// <summary>
+	/// 衝突を検出したら呼び出されるコールバック関数
+	/// </summary>
+	void OnCollision();
+	/// <summary>
+	/// 弾リストを取得する
+	/// </summary>
+	/// <returns></returns>
+	const std::list<std::unique_ptr<EnemyBullet>>& GetBullets() { return bullets_; };
+	/// <summary>
 	/// プレイヤーのセッター
 	/// </summary>
 	void SetPlayer(Player* player) { player_ = player; }

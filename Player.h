@@ -25,6 +25,15 @@ public:
 	/// </summary>
 	void Draw(ViewProjection viewprojection);
 	/// <summary>
+	/// 衝突を検出したら呼び出されるコールバック関数
+	/// </summary>
+	void OnCollision();
+	/// <summary>
+	/// 弾リストを取得する
+	/// </summary>
+	/// <returns></returns>
+	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() { return bullets_; };
+	/// <summary>
 	/// 座標のゲッター
 	/// </summary>
 	/// <returns></returns>

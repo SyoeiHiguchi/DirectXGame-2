@@ -55,3 +55,7 @@ Vector3 EnemyBullet::GetTransform()
 	return worldPos;
 }
 
+void EnemyBullet::OnCollision(){
+	isDead_ = true;
+}
+

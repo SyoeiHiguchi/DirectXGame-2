@@ -23,6 +23,10 @@ public:
 	/// </summary>
 	void Draw(const ViewProjection& viewProjection);
 	/// <summary>
+	/// 衝突を検出したら呼び出されるコールバック関数
+	/// </summary>
+	void OnCollision();
+	/// <summary>
 	/// 座標のゲッター
 	/// </summary>
 	/// <returns></returns>

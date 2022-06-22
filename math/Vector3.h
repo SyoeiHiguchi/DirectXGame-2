@@ -11,10 +11,32 @@ public:
 	Vector3(float x, float y,float z);//x成分とy成分を指定して生成
 
 	//メンバ関数
-	float length() const;//ノルムの長さを求める
-	Vector3& normalize();//正規化する
-	float dot(const Vector3& v) const;//内積を求める
-	Vector3 cross(const Vector3& v) const;//外積を求める
+	
+	/// <summary>
+	/// ノルムの長さを求める
+	/// </summary>
+	/// <returns>float</returns>
+	float length() const;
+	/// <summary>
+	/// 正規化する
+	/// </summary>
+	/// <returns>Vector3</returns>
+	Vector3& normalize();
+	/// <summary>
+	/// 内積を求める
+	/// </summary>
+	/// <returns>float</returns>
+	float dot(const Vector3& v) const;
+	/// <summary>
+	/// 外積を求める
+	/// </summary>
+	/// <returns>Vector3</returns>
+	Vector3 cross(const Vector3& v) const;
+	/// <summary>
+	/// 球面線形保管
+	/// </summary>
+	/// <returns></returns>
+	Vector3 Slerp(const Vector3& v, const Vector3& v2, float t);
 
 	//単項演算子オーバーロード
 	Vector3 operator+() const;
