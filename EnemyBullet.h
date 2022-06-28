@@ -4,7 +4,9 @@
 #include <input/Input.h>
 #include <2d/DebugText.h>
 #include <assert.h>
-class EnemyBullet{
+#include "Collider.h"
+
+class EnemyBullet : public Collider {
 public:
 	/// <summary>
 	/// 初期化
@@ -24,7 +26,7 @@ public:
 	/// 座標のゲッター
 	/// </summary>
 	/// <returns></returns>
-	Vector3 GetTransform();
+	Vector3 GetWorldPosition();
 	/// <summary>
 	/// 衝突を検出したら呼び出されるコールバック関数
 	/// </summary>

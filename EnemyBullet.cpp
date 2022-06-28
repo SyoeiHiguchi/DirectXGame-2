@@ -44,7 +44,7 @@ void EnemyBullet::Draw(const ViewProjection& viewProjection)
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
 }
 
-Vector3 EnemyBullet::GetTransform()
+Vector3 EnemyBullet::GetWorldPosition()
 {
 	//ƒ[ƒ‹ƒhÀ•W‚ğ“ü‚ê‚é•Ï”
 	Vector3 worldPos;

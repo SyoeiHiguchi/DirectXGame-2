@@ -67,7 +67,7 @@ void Player::OnCollision()
 {
 }
 
-Vector3 Player::GetTransform()
+Vector3 Player::GetWorldPosition()
 {
 	//ƒ[ƒ‹ƒhÀ•W‚ğ“ü‚ê‚é•Ï”
 	Vector3 worldPos;

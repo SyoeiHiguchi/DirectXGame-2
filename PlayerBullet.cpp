@@ -40,7 +40,7 @@ void PlayerBullet::OnCollision()
 	isDead_ = true;
 }
 
-Vector3 PlayerBullet::GetTransform()
+Vector3 PlayerBullet::GetWorldPosition()
 {
 	//ƒ[ƒ‹ƒhÀ•W‚ğ“ü‚ê‚é•Ï”
 	Vector3 worldPos;

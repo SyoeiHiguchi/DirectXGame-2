@@ -207,9 +207,6 @@ void GameScene::Draw() {
 }
 
 void GameScene::CheckAllCollisions(){
-	//　判定対象AとBの座標
-	Vector3 posA, posB;
-
 	//自弾リストを取得
 	const std::list<std::unique_ptr<PlayerBullet>>& playerBullets = player_->GetBullets();
 	//敵弾リストを取得
@@ -217,44 +214,19 @@ void GameScene::CheckAllCollisions(){
 
 #pragma region 自キャラと敵弾の当たり判定
 	//自キャラの座標
-	posA = player_->GetTransform();
-
 	//自キャラと敵弾全ての当たり判定
 	for (const std::unique_ptr<EnemyBullet>& bullets : enemyBullets) {
-		//敵弾の座標
-		posB = bullets->GetTransform();
-		//座標Aと座標Bの距離を求める
-		Vector3 Dir = posA - posB;
-		float rad = 1;
-		bool collision = Dir.x * Dir.x + Dir.y * Dir.y + Dir.z * Dir.z <= rad * rad;
-		if (collision) {
-			//自キャラの衝突時コールバックを呼び出す
-			player_->OnCollision();
-			//敵弾の衝突時コールバックを呼び出す
-			bullets->OnCollision();
-		}
+		//ペアの衝突判定
+		CheckOnCollisions(player_.get(), bullets.get());
 	}
 
 #pragma endregion
 
 #pragma region 自弾と敵の当たり判定
-	//自キャラの座標
-	posA = enemy_->GetTransform();
-
 	//自キャラと敵弾全ての当たり判定
 	for (const std::unique_ptr<PlayerBullet>& bullets : playerBullets) {
-		//敵弾の座標
-		posB = bullets->GetTransform();
-		//座標Aと座標Bの距離を求める
-		Vector3 Dir = posA - posB;
-		float rad = 1;
-		bool collision = Dir.x * Dir.x + Dir.y * Dir.y + Dir.z * Dir.z <= rad * rad;
-		if (collision) {
-			//敵の衝突時コールバックを呼び出す
-			enemy_->OnCollision();
-			//弾の衝突時コールバックを呼び出す
-			bullets->OnCollision();
-		}
+		//ペアの衝突判定
+		CheckOnCollisions(enemy_.get(), bullets.get());
 	}
 #pragma endregion
 
@@ -262,22 +234,24 @@ void GameScene::CheckAllCollisions(){
 	//自弾と敵弾全ての当たり判定
 	for (const std::unique_ptr<PlayerBullet>& Pbullets : playerBullets) {
 		for (const std::unique_ptr<EnemyBullet>& Ebullets : enemyBullets) {
-			//自弾の座標
-			posA = Pbullets->GetTransform();
-			posB = Ebullets->GetTransform();
-			//座標Aと座標Bの距離を求める
-			Vector3 Dir = posA - posB;
-			float rad = 1;
-			bool collision = Dir.x * Dir.x + Dir.y * Dir.y + Dir.z * Dir.z <= rad * rad;
-			if (collision) {
-				//自弾の衝突時コールバックを呼び出す
-				Pbullets->OnCollision();
-				//敵弾の衝突時コールバックを呼び出す
-			    Ebullets->OnCollision();
-			}
+			//ペアの衝突判定
+			CheckOnCollisions(Pbullets.get(), Ebullets.get());
 		}
 	}
 	//自キャラと敵弾全ての当たり判定
 	
 #pragma endregion
+}
+
+void GameScene::CheckOnCollisions(Collider* A, Collider* B){
+	//座標Aと座標Bの距離を求める
+	Vector3 Dir = A->GetWorldPosition() - B->GetWorldPosition();
+	float rad = A->GetRadius() + B->GetRadius();
+	bool collision = Dir.x * Dir.x + Dir.y * Dir.y + Dir.z * Dir.z <= rad * rad;
+	if (collision) {
+		//自弾の衝突時コールバックを呼び出す
+		A->OnCollision();
+		//敵弾の衝突時コールバックを呼び出す
+		B->OnCollision();
+	}
 }

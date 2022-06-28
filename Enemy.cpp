@@ -68,8 +68,8 @@ void Enemy::Fire()
 	assert(player_);
 	//弾の速度
 	const float kBulletSpeed = 1.0f;
-	Vector3 PlayerPos = player_->GetTransform();
-	Vector3 MyPos = this->GetTransform();
+	Vector3 PlayerPos = player_->GetWorldPosition();
+	Vector3 MyPos = this->GetWorldPosition();
 	
 	Vector3 velocity = PlayerPos - MyPos;
 	velocity.normalize();
@@ -111,7 +111,7 @@ void Enemy::OnCollision()
 {
 }
 
-Vector3 Enemy::GetTransform()
+Vector3 Enemy:: GetWorldPosition()
 {
 	//ワールド座標を入れる変数
 	Vector3 worldPos;

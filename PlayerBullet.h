@@ -5,7 +5,8 @@
 #include <input/Input.h>
 #include <2d/DebugText.h>
 #include <assert.h>
-class PlayerBullet
+#include "Collider.h"
+class PlayerBullet : public Collider
 {
 public:
 	/// <summary>
@@ -30,7 +31,7 @@ public:
 	/// 座標のゲッター
 	/// </summary>
 	/// <returns></returns>
-	Vector3 GetTransform();
+	Vector3 GetWorldPosition();
 
 	bool IsDead() const { return isDead_; }
 private:

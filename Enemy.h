@@ -7,6 +7,7 @@
 #include <memory>
 #include "EnemyBullet.h"
 #include "TimedCall.h"
+#include "Collider.h"
 
 class BaseEnemyState;
 //自キャラの前方宣言
@@ -18,7 +19,7 @@ enum class Phase {
 	Leave,//離脱する
 };
 
-class Enemy
+class Enemy : public Collider
 {
 public:
 	/// <summary>
@@ -66,10 +67,11 @@ public:
 	/// プレイヤーのセッター
 	/// </summary>
 	void SetPlayer(Player* player) { player_ = player; }
+	/// <summary>
 	/// 座標のゲッター
 	/// </summary>
 	/// <returns></returns>
-	Vector3 GetTransform();
+	Vector3 GetWorldPosition();
 
 	~Enemy();//デストラクタ
 private:

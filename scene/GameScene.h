@@ -68,4 +68,11 @@ class GameScene {
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
+private:
+	/// <summary>
+	/// コライダー二つの衝突判定と応答
+	/// </summary>
+	/// <param name="A">コライダーA</param>
+	/// <param name="B">コライダーB</param>
+	void CheckOnCollisions(Collider* A, Collider* B);
 };

@@ -6,10 +6,11 @@
 #include <assert.h>
 #include "PlayerBullet.h"
 #include <memory>
+#include "Collider.h"
 /// <summary>
 /// 自キャラ
 /// </summary>
-class Player
+class Player : public Collider
 {
 public:
 	/// <summary>
@@ -37,7 +38,7 @@ public:
 	/// 座標のゲッター
 	/// </summary>
 	/// <returns></returns>
-	Vector3 GetTransform();
+	Vector3 GetWorldPosition();
 private:
 	/// <summary>
 	///	描画

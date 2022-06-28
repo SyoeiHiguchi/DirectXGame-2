@@ -13,7 +13,7 @@ void EnemyStateApproach::Action(Enemy* enemy){
 	Vector3 vec = { 0,0,-0.1 };
 	enemy->Move(vec);
 	//‹K’è‚ÌˆÊ’u‚É“ž’B‚µ‚½‚ç—£’E
-	if (enemy->GetTransform().z < -30.0f) {
+	if (enemy->GetWorldPosition().z < -30.0f) {
 		enemy->TimeListReset();
 		enemy->ChangeState(new EnemyStateLeave);
 	}
