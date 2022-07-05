@@ -25,7 +25,7 @@ void Enemy::Initialize(Model* model)
 	//Õ“Ë‘®«İ’è
 	collisionConfig_.SetcollisionAttribute(kCollisionAttributeEnemy);
 	//Õ“Ë‘ÎÛ‚ğ©•ª‚Ì‘®«ˆÈŠO‚Éİ’è
-	collisionConfig_.SetCollisionMask(!kCollisionAttributeEnemy);
+	collisionConfig_.SetCollisionMask(~kCollisionAttributeEnemy);
 }
 
 

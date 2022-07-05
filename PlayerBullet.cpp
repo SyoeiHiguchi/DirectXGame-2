@@ -22,7 +22,7 @@ void PlayerBullet::Initialize(Model* model, const Vector3& position, const Vecto
 	//Õ“Ë‘®«İ’è
 	collisionConfig_.SetcollisionAttribute(kCollisionAttributePlayer);
 	//Õ“Ë‘ÎÛ‚ğ©•ª‚Ì‘®«ˆÈŠO‚Éİ’è
-	collisionConfig_.SetCollisionMask(!kCollisionAttributePlayer);
+	collisionConfig_.SetCollisionMask(~kCollisionAttributePlayer);
 }
 
 void PlayerBullet::Update()

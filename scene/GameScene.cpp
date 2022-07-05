@@ -258,8 +258,8 @@ void GameScene::CheckAllCollisions(){
 
 void GameScene::CheckOnCollisions(Collider* A, Collider* B){
 	//座標Aと座標Bの距離を求める
-	if (!(A->collisionConfig_.GetcollisionAttribute() && B->collisionConfig_.GetCollisionMask())
-		|| !(B->collisionConfig_.GetcollisionAttribute() && A->collisionConfig_.GetCollisionMask())) {
+	if ((A->collisionConfig_.GetcollisionAttribute() & B->collisionConfig_.GetCollisionMask())
+		|| (B->collisionConfig_.GetcollisionAttribute() & A->collisionConfig_.GetCollisionMask())) {
 		return;
 	}
 	Vector3 Dir = A->GetWorldPosition() - B->GetWorldPosition();

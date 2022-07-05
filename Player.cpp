@@ -23,7 +23,7 @@ void Player::Initialize(Model* model, uint32_t textureHandle)
 	//Õ“Ë‘®«İ’è
 	collisionConfig_.SetcollisionAttribute(kCollisionAttributePlayer);
 	//Õ“Ë‘ÎÛ‚ğ©•ª‚Ì‘®«ˆÈŠO‚Éİ’è
-	collisionConfig_.SetCollisionMask(!kCollisionAttributePlayer);
+	collisionConfig_.SetCollisionMask(~kCollisionAttributePlayer);
 }
 
 void Player::Update()
