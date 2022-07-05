@@ -12,6 +12,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include <memory>
+#include "Skydome.h"
 
 
 
@@ -58,11 +59,13 @@ class GameScene {
 	DebugText* debugText_ = nullptr;
 	uint32_t textureHandle_ = 0;//テクスチャハンドル
 	Model* model_ = nullptr;//3dモデル
+	Model* ModelSkydome_ = nullptr;//３ｄモデル　スカイドーム
 	ViewProjection viewProjection_;//ビュープロジェクション
 	DebugCamera* debugCamera_ = nullptr;//デバッグカメラ
 	float viewAngel = 0.0f;//カメラ上方向の角度
 	std::unique_ptr<Player> player_ = nullptr;
 	std::unique_ptr<Enemy> enemy_ = nullptr;
+	std::unique_ptr<Skydome> skydome_ = nullptr;
 	bool isDubugCameraActive_ = false;//デバッグカメラを有効化
 
 	/// <summary>

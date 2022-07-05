@@ -1,4 +1,5 @@
 #pragma once
+#include "CollisionConfig.h"
 /// <summary>
 /// 衝突判定オブジェクト
 /// </summary>
@@ -22,7 +23,13 @@ public:
 	/// </summary>
 	/// <returns>float</returns>
 	float GetRadius() { return radius_; }
-private:
+
+public:
+	//フィルタリング
+	CollsionConfig collisionConfig_;
+
+protected:
 	//衝突半径
 	float radius_ = 1;
+	
 };

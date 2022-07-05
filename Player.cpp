@@ -20,6 +20,10 @@ void Player::Initialize(Model* model, uint32_t textureHandle)
 	MyMatrix::MatrixScale(worldTransform_);
 	MyMatrix::MatrixRotation(worldTransform_);
 	MyMatrix::MatrixTranslation(worldTransform_);
+	//Õ“Ë‘®«İ’è
+	collisionConfig_.SetcollisionAttribute(kCollisionAttributePlayer);
+	//Õ“Ë‘ÎÛ‚ğ©•ª‚Ì‘®«ˆÈŠO‚Éİ’è
+	collisionConfig_.SetCollisionMask(!kCollisionAttributePlayer);
 }
 
 void Player::Update()

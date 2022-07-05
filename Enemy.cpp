@@ -20,7 +20,12 @@ void Enemy::Initialize(Model* model)
 	MyMatrix::MatrixScale(worldTransform_);
 	MyMatrix::MatrixRotation(worldTransform_);
 	MyMatrix::MatrixTranslation(worldTransform_);
+	//ステート管理
 	state_ = new EnemyStateApproach();
+	//衝突属性設定
+	collisionConfig_.SetcollisionAttribute(kCollisionAttributeEnemy);
+	//衝突対象を自分の属性以外に設定
+	collisionConfig_.SetCollisionMask(!kCollisionAttributeEnemy);
 }
 
 

@@ -16,6 +16,7 @@ GameScene::GameScene() {}
 GameScene::~GameScene() {
 	delete model_;
 	delete debugCamera_;
+	delete ModelSkydome_;
 }
 
 void GameScene::Initialize() {
@@ -26,12 +27,16 @@ void GameScene::Initialize() {
 	debugText_ = DebugText::GetInstance();
 	textureHandle_ = TextureManager::Load("mario.jpg");
 	model_ = Model::Create();
+	ModelSkydome_ = Model::CreateFromOBJ("skydome", true);//skydomeのモデルを読み込む
 	
 	player_ = std::make_unique<Player>();//自キャラの生成
 	player_->Initialize(model_,textureHandle_);//プレイヤーの初期化
 
 	enemy_ = std::make_unique<Enemy>();//エネミーの生成
 	enemy_->Initialize(model_);//エネミーの初期化
+
+	skydome_ = std::make_unique<Skydome>();
+	skydome_->Initialize(ModelSkydome_);
 
 	//viewProjection_.eye = { 0,0,-50 };    //カメラ視点座標を設定
 	//viewProjection_.target = {10,0,0}; //カメラ注視点を設定
@@ -50,18 +55,19 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
-#ifdef DEBUG
+#ifndef DEBUG
 	if (input_->TriggerKey(DIK_D)) {
 		isDubugCameraActive_ = !isDubugCameraActive_;
 	}
 	if (isDubugCameraActive_) {
 		debugCamera_->Update();//デバッグカメラの更新
-		viewProjection_.matView = debugCamera_->GetViewProjection();
-		viewProjection_.matProjection = debugCamera_->SetDistance();
+		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
+		viewProjection_.TransferMatrix();
 
 	}
-	else{
-		viewProjection_.UpdateMatrix(); //行列の再計算
+	else {
+		viewProjection_.TransferMatrix(); //行列の再計算
 	}
 #endif // DEBUG
 	
@@ -135,6 +141,8 @@ void GameScene::Update() {
 	//	debugText_->SetPos(50, 130); //デバック用表示
 	//	debugText_->Printf("nearZ:%f", viewProjection_.nearZ);
 	//}
+
+	skydome_->Update();
 	
 	player_->Update();
 	enemy_->Update();
@@ -168,8 +176,13 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	/// 3Dモデル描画
-	player_->Draw(viewProjection_);
-	enemy_->Draw(viewProjection_);
+	
+	//skydome_->Draw(viewProjection_);
+	//player_->Draw(viewProjection_);
+	//enemy_->Draw(viewProjection_);
+	skydome_->Draw(debugCamera_->GetViewProjection());
+	player_->Draw(debugCamera_->GetViewProjection());
+	enemy_->Draw(debugCamera_->GetViewProjection());
 
 	{
 		Vector3 p1 = { 0,0,0 };//線描画
@@ -212,39 +225,43 @@ void GameScene::CheckAllCollisions(){
 	//敵弾リストを取得
 	const std::list<std::unique_ptr<EnemyBullet>>& enemyBullets = enemy_->GetBullets();
 
-#pragma region 自キャラと敵弾の当たり判定
-	//自キャラの座標
-	//自キャラと敵弾全ての当たり判定
-	for (const std::unique_ptr<EnemyBullet>& bullets : enemyBullets) {
-		//ペアの衝突判定
-		CheckOnCollisions(player_.get(), bullets.get());
-	}
-
-#pragma endregion
-
-#pragma region 自弾と敵の当たり判定
-	//自キャラと敵弾全ての当たり判定
+	//コライダー
+	std::list<Collider*> colliders_;
+	//コライダーをリストに追加
+	colliders_.push_back(player_.get());
+	colliders_.push_back(enemy_.get());
+	//自弾のすべて
 	for (const std::unique_ptr<PlayerBullet>& bullets : playerBullets) {
-		//ペアの衝突判定
-		CheckOnCollisions(enemy_.get(), bullets.get());
+		colliders_.push_back(bullets.get());
 	}
-#pragma endregion
+	//敵弾のすべて
+	for (const std::unique_ptr<EnemyBullet>& bullets : enemyBullets) {
+		colliders_.push_back(bullets.get());
+	}
+	//リスト内のペアを総当たり
+	std::list<Collider*>::iterator itrA = colliders_.begin();
+	for (; itrA != colliders_.end(); ++itrA){
+		//イテレーターAからコライダーAを取得する
+		Collider *a = *itrA;
+		//イテレーターBはイテレーターAの次の要素から回す(重複判定を回避)
+		std::list<Collider*>::iterator itrB = itrA;
+		itrB++;
+		for (; itrB != colliders_.end(); ++itrB) {
+			//イテレーターBからコライダーBを取得
+			Collider* b = *itrB;
+			//ペアの当たり判定
+			CheckOnCollisions(a, b);
 
-#pragma region 自弾と敵弾の当たり判定
-	//自弾と敵弾全ての当たり判定
-	for (const std::unique_ptr<PlayerBullet>& Pbullets : playerBullets) {
-		for (const std::unique_ptr<EnemyBullet>& Ebullets : enemyBullets) {
-			//ペアの衝突判定
-			CheckOnCollisions(Pbullets.get(), Ebullets.get());
 		}
 	}
-	//自キャラと敵弾全ての当たり判定
-	
-#pragma endregion
 }
 
 void GameScene::CheckOnCollisions(Collider* A, Collider* B){
 	//座標Aと座標Bの距離を求める
+	if (!(A->collisionConfig_.GetcollisionAttribute() && B->collisionConfig_.GetCollisionMask())
+		|| !(B->collisionConfig_.GetcollisionAttribute() && A->collisionConfig_.GetCollisionMask())) {
+		return;
+	}
 	Vector3 Dir = A->GetWorldPosition() - B->GetWorldPosition();
 	float rad = A->GetRadius() + B->GetRadius();
 	bool collision = Dir.x * Dir.x + Dir.y * Dir.y + Dir.z * Dir.z <= rad * rad;

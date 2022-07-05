@@ -28,6 +28,10 @@ void EnemyBullet::Initialize(Model* model, const Vector3& position, const Vector
 	worldTransform_.translation_ = position;
 	//ˆø”‚Åó‚¯æ‚Á‚½‘¬“x‚ğƒƒ“ƒo•Ï”‚É‘ã“ü
 	velocity_ = velocity;
+	//Õ“Ë‘®«İ’è
+	collisionConfig_.SetcollisionAttribute(kCollisionAttributeEnemy);
+	//Õ“Ë‘ÎÛ‚ğ©•ª‚Ì‘®«ˆÈŠO‚Éİ’è
+	collisionConfig_.SetCollisionMask(!kCollisionAttributeEnemy);
 }
 
 void EnemyBullet::Update()
