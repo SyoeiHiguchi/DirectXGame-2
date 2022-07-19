@@ -38,13 +38,19 @@ void GameScene::Initialize() {
 	skydome_ = std::make_unique<Skydome>();
 	skydome_->Initialize(ModelSkydome_);
 
+	railcamera_ = std::make_unique<RailCamera>();
+
+	railcamera_->Initialize(Vector3(0,0,-50), Vector3(0,0,0), &viewProjection_);
+
+	player_->SetPearent(railcamera_->GetWorldTransform());
+
 	//viewProjection_.eye = { 0,0,-50 };    //カメラ視点座標を設定
 	//viewProjection_.target = {10,0,0}; //カメラ注視点を設定
 	//viewProjection_.up = {ConvertToRadians(45.0f),ConvertToRadians(45.0f) ,0};
 	//viewProjection_.fovAngleY = ConvertToRadians(10.0f); //カメラ垂直方向視野角を設定
 	//viewProjection_.aspectRatio = 1.0f;                    //アスペクト比の設定
 	//viewProjection_.nearZ = 52.0f;                          //ニアクリップ距離を設定
-	//viewProjection_.farZ = 53.0f;//ファークリップ距離を設定
+	viewProjection_.farZ = 1000.0f;//ファークリップ距離を設定
 	viewProjection_.Initialize();//ビュープロジェクションの初期化
 	debugCamera_ = new DebugCamera(1280, 720);
 	AxisIndicator::GetInstance()->SetVisible(true);//軸方向表示の表示を有効化する
@@ -142,11 +148,18 @@ void GameScene::Update() {
 	//	debugText_->Printf("nearZ:%f", viewProjection_.nearZ);
 	//}
 
+
+	railcamera_->Update();
+
 	skydome_->Update();
 	
 	player_->Update();
 	enemy_->Update();
 	CheckAllCollisions();
+
+	
+
+	
 }
 
 void GameScene::Draw() {
@@ -177,12 +190,12 @@ void GameScene::Draw() {
 	/// </summary>
 	/// 3Dモデル描画
 	
-	//skydome_->Draw(viewProjection_);
-	//player_->Draw(viewProjection_);
-	//enemy_->Draw(viewProjection_);
-	skydome_->Draw(debugCamera_->GetViewProjection());
+	skydome_->Draw(viewProjection_);
+	player_->Draw(viewProjection_);
+	enemy_->Draw(viewProjection_);
+	/*skydome_->Draw(debugCamera_->GetViewProjection());
 	player_->Draw(debugCamera_->GetViewProjection());
-	enemy_->Draw(debugCamera_->GetViewProjection());
+	enemy_->Draw(debugCamera_->GetViewProjection());*/
 
 	{
 		Vector3 p1 = { 0,0,0 };//線描画

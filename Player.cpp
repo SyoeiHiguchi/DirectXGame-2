@@ -15,7 +15,7 @@ void Player::Initialize(Model* model, uint32_t textureHandle)
 	//ワールド変換の初期化
 	worldTransform_.scale_ = { 1.0f,1.0f,1.0f };//x,y,z方向のスケーリング設定
 	worldTransform_.rotation_ = { 0,0,0};//x,y,z軸周りの回転角を設定
-	worldTransform_.translation_ = { 0,0,-10.0f };//x,y,z軸周りの平行移動を設定する
+	worldTransform_.translation_ = { 0,0,20.0f };//x,y,z軸周りの平行移動を設定する
 	worldTransform_.Initialize();
 	MyMatrix::MatrixScale(worldTransform_);
 	MyMatrix::MatrixRotation(worldTransform_);
@@ -42,14 +42,24 @@ void Player::Update()
 	if (input_->PushKey(DIK_RIGHT)) move.x = 0.5;
 	//座標移動
 	worldTransform_.translation_ += move;
+	
 	//移動限界処理
 	const float kMoveLimitX = 30;
 	const float kMoveLimitY = 10;
 	worldTransform_.translation_.x = min(kMoveLimitX, max(worldTransform_.translation_.x, -kMoveLimitX));
 	worldTransform_.translation_.y = min(kMoveLimitY, max(worldTransform_.translation_.y, -kMoveLimitY));
 	Rotate();
+
 	//行列更新
 	MyMatrix::MatrixUpdate(worldTransform_);
+	
+	//親要素との掛け算
+	worldTransform_.matWorld_ *= worldTransform_.parent_->matWorld_;
+	
+	worldTransform_.TransferMatrix();
+
+	
+	debugText_->SetPos(0, 100);
 	debugText_->Printf(
 		"transform:(%f,%f,%f)", worldTransform_.translation_.x,worldTransform_.translation_.y,worldTransform_.translation_.z);
 	//キャラクター攻撃処理
@@ -94,7 +104,7 @@ void Player::Attack()
 
 		//弾を生成し初期化
 		std::unique_ptr<PlayerBullet> newBullet = std::make_unique<PlayerBullet>();
-		newBullet->Initialize(model_, worldTransform_.translation_,velocity);
+		newBullet->Initialize(model_, this->GetWorldPosition(), velocity);
 		//弾を登録する
 		bullets_.push_back(std::move(newBullet));
 	}

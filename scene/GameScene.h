@@ -13,6 +13,7 @@
 #include "Enemy.h"
 #include <memory>
 #include "Skydome.h"
+#include "RailCamera.h"
 
 
 
@@ -66,6 +67,7 @@ class GameScene {
 	std::unique_ptr<Player> player_ = nullptr;
 	std::unique_ptr<Enemy> enemy_ = nullptr;
 	std::unique_ptr<Skydome> skydome_ = nullptr;
+	std::unique_ptr<RailCamera> railcamera_ = nullptr;//レールカメラ
 	bool isDubugCameraActive_ = false;//デバッグカメラを有効化
 
 	/// <summary>

@@ -39,6 +39,8 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	Vector3 GetWorldPosition();
+
+	void SetPearent(const WorldTransform& worldtransform) { worldTransform_.parent_ = &worldtransform; }
 private:
 	/// <summary>
 	///	•`‰æ
