@@ -8,6 +8,8 @@
 #include "EnemyBullet.h"
 #include "TimedCall.h"
 #include "Collider.h"
+#include "BulletManager.h"
+
 
 class BaseEnemyState;
 //自キャラの前方宣言
@@ -25,7 +27,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(Model* model);
+	void Initialize(Model* model,Vector3 vec);
 	/// <summary>
 	///	接近フェーズ初期化
 	/// </summary>
@@ -59,11 +61,6 @@ public:
 	/// </summary>
 	void OnCollision();
 	/// <summary>
-	/// 弾リストを取得する
-	/// </summary>
-	/// <returns></returns>
-	const std::list<std::unique_ptr<EnemyBullet>>& GetBullets() { return bullets_; };
-	/// <summary>
 	/// プレイヤーのセッター
 	/// </summary>
 	void SetPlayer(Player* player) { player_ = player; }
@@ -72,6 +69,12 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	Vector3 GetWorldPosition();
+
+	/// <summary>
+	/// やられたかどうか
+	/// </summary>
+	/// <returns></returns>
+	bool IsDead() const { return isdead_; }
 
 	~Enemy();//デストラクタ
 private:
@@ -93,7 +96,7 @@ private:
 	BaseEnemyState* state_;
 	
 	//弾
-	std::list<std::unique_ptr<EnemyBullet>> bullets_;
+	BulletManager* bulletMnager = nullptr;
 
 	//発射感覚
 	static const int kFireInterval = 60;
@@ -105,5 +108,7 @@ private:
 
 	//時限発動のリスト
 	std::list<std::unique_ptr<TimedCall>> timedCalls_;
+
+	bool isdead_ = false;
 };
 

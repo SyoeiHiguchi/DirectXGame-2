@@ -5,7 +5,7 @@
 #include "Player.h"
 #include <cassert>
 
-void Enemy::Initialize(Model* model)
+void Enemy::Initialize(Model* model, Vector3 vec)
 {
 	//NULLポインタチェック
 	assert(model);
@@ -15,7 +15,7 @@ void Enemy::Initialize(Model* model)
 	//ワールド変換の初期化
 	worldTransform_.scale_ = { 1.0f,1.0f,1.0f };//x,y,z方向のスケーリング設定
 	worldTransform_.rotation_ = { 0,0,0 };//x,y,z軸周りの回転角を設定
-	worldTransform_.translation_ = { 0,0,60 };//x,y,z軸周りの平行移動を設定する
+	worldTransform_.translation_ = { vec.x,vec.y,vec.z };//x,y,z軸周りの平行移動を設定する
 	worldTransform_.Initialize();
 	MyMatrix::MatrixScale(worldTransform_);
 	MyMatrix::MatrixRotation(worldTransform_);
@@ -26,23 +26,18 @@ void Enemy::Initialize(Model* model)
 	collisionConfig_.SetcollisionAttribute(kCollisionAttributeEnemy);
 	//衝突対象を自分の属性以外に設定
 	collisionConfig_.SetCollisionMask(~kCollisionAttributeEnemy);
+
+	bulletMnager = BulletManager::GetInstance();
 }
 
 
 void Enemy::Update()
 {
-	//デスフラグの立った弾を削除
-	bullets_.remove_if([](std::unique_ptr<EnemyBullet>& bullet) {
-		return bullet->IsDead();
-		});
-
 	state_->Action(this);
 	//行列更新
 	MyMatrix::MatrixUpdate(worldTransform_);
 
-	for (auto& bullet : bullets_) {
-		bullet->Update();
-	}
+	
 
 	//終了したタイマーを削除
 	timedCalls_.remove_if([](std::unique_ptr<TimedCall>& timedcall) {
@@ -57,9 +52,7 @@ void Enemy::Update()
 void Enemy::Draw(ViewProjection viewprojection)
 {
 	model_->Draw(worldTransform_, viewprojection, textureHandle_);
-	for (auto& bullet : bullets_) {
-		bullet->Draw(viewprojection);
-	}
+	
 }
 
 void Enemy::Move(Vector3 vec)
@@ -84,7 +77,8 @@ void Enemy::Fire()
 	std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
 	newBullet->Initialize(model_, worldTransform_.translation_, velocity);
 	//弾を登録する
-	bullets_.push_back(std::move(newBullet));
+	bulletMnager->AddEnemyBullet(newBullet);
+	//bullets_.push_back(std::move(newBullet));
 }
 
 void Enemy::ApproachPhaseInitialize()
@@ -114,6 +108,7 @@ void Enemy::TimeListReset()
 
 void Enemy::OnCollision()
 {
+	isdead_ = true;
 }
 
 Vector3 Enemy:: GetWorldPosition()

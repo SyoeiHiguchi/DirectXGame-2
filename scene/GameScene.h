@@ -14,7 +14,9 @@
 #include <memory>
 #include "Skydome.h"
 #include "RailCamera.h"
-
+#include "BulletManager.h"
+#include <fstream>
+#include <sstream>
 
 
 /// <summary>
@@ -53,6 +55,13 @@ class GameScene {
 	/// </summary>
 	void CheckAllCollisions();
 
+	/// <summary>
+	/// 敵発生データの読み込み
+	/// </summary>
+	void LoadEnemyPopDate();
+
+	void UpdateEnemyPopCommands();
+
   private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
@@ -65,14 +74,20 @@ class GameScene {
 	DebugCamera* debugCamera_ = nullptr;//デバッグカメラ
 	float viewAngel = 0.0f;//カメラ上方向の角度
 	std::unique_ptr<Player> player_ = nullptr;
-	std::unique_ptr<Enemy> enemy_ = nullptr;
+	std::list<std::unique_ptr<Enemy>> enemys_;
 	std::unique_ptr<Skydome> skydome_ = nullptr;
 	std::unique_ptr<RailCamera> railcamera_ = nullptr;//レールカメラ
+	BulletManager* bulletManager_ = nullptr;//敵の弾管理クラス
 	bool isDubugCameraActive_ = false;//デバッグカメラを有効化
 
-	/// <summary>
-	/// ゲームシーン用
-	/// </summary>
+	std::stringstream enemyPopCommands;
+
+
+	//時間管理
+	bool waitflag;
+	int waitTimer;
+
+	
 private:
 	/// <summary>
 	/// コライダー二つの衝突判定と応答

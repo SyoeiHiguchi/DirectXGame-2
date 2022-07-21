@@ -5,6 +5,7 @@
 #include "PrimitiveDrawer.h"
 #include <random>
 
+
 constexpr auto PI = 3.1415926;
 
 float ConvertToRadians(float Degrees) { return Degrees * (PI / 180.0f); }
@@ -32,9 +33,6 @@ void GameScene::Initialize() {
 	player_ = std::make_unique<Player>();//自キャラの生成
 	player_->Initialize(model_,textureHandle_);//プレイヤーの初期化
 
-	enemy_ = std::make_unique<Enemy>();//エネミーの生成
-	enemy_->Initialize(model_);//エネミーの初期化
-
 	skydome_ = std::make_unique<Skydome>();
 	skydome_->Initialize(ModelSkydome_);
 
@@ -43,6 +41,12 @@ void GameScene::Initialize() {
 	railcamera_->Initialize(Vector3(0,0,-50), Vector3(0,0,0), &viewProjection_);
 
 	player_->SetPearent(railcamera_->GetWorldTransform());
+
+	bulletManager_ = BulletManager::GetInstance();
+
+	LoadEnemyPopDate();
+
+	
 
 	//viewProjection_.eye = { 0,0,-50 };    //カメラ視点座標を設定
 	//viewProjection_.target = {10,0,0}; //カメラ注視点を設定
@@ -56,8 +60,8 @@ void GameScene::Initialize() {
 	AxisIndicator::GetInstance()->SetVisible(true);//軸方向表示の表示を有効化する
 	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);//軸方向が参照するビュープロダクションを指定する
 	PrimitiveDrawer::GetInstance()->SetViewProjection(&debugCamera_->GetViewProjection());//ライン描画するビュープロジェクションを指定する
-
-	enemy_->SetPlayer(player_.get());	
+	
+	
 }
 
 void GameScene::Update() {
@@ -147,19 +151,18 @@ void GameScene::Update() {
 	//	debugText_->SetPos(50, 130); //デバック用表示
 	//	debugText_->Printf("nearZ:%f", viewProjection_.nearZ);
 	//}
-
+	UpdateEnemyPopCommands();
 
 	railcamera_->Update();
 
 	skydome_->Update();
 	
 	player_->Update();
-	enemy_->Update();
+	for (auto& enemy : enemys_) {
+		enemy->Update();
+	}
+	bulletManager_->Update();
 	CheckAllCollisions();
-
-	
-
-	
 }
 
 void GameScene::Draw() {
@@ -192,7 +195,13 @@ void GameScene::Draw() {
 	
 	skydome_->Draw(viewProjection_);
 	player_->Draw(viewProjection_);
-	enemy_->Draw(viewProjection_);
+	enemys_.remove_if([](std::unique_ptr<Enemy>& enemy) {
+		return enemy->IsDead();
+		});
+	for (auto& enemy : enemys_) {
+		enemy->Draw(viewProjection_);
+	}
+	bulletManager_->Draw(viewProjection_);
 	/*skydome_->Draw(debugCamera_->GetViewProjection());
 	player_->Draw(debugCamera_->GetViewProjection());
 	enemy_->Draw(debugCamera_->GetViewProjection());*/
@@ -236,13 +245,15 @@ void GameScene::CheckAllCollisions(){
 	//自弾リストを取得
 	const std::list<std::unique_ptr<PlayerBullet>>& playerBullets = player_->GetBullets();
 	//敵弾リストを取得
-	const std::list<std::unique_ptr<EnemyBullet>>& enemyBullets = enemy_->GetBullets();
+	const std::list<std::unique_ptr<EnemyBullet>>& enemyBullets = bulletManager_->GetBullets();
 
 	//コライダー
 	std::list<Collider*> colliders_;
 	//コライダーをリストに追加
 	colliders_.push_back(player_.get());
-	colliders_.push_back(enemy_.get());
+	for (auto& enemy : enemys_) {
+		colliders_.push_back(enemy.get());
+	}
 	//自弾のすべて
 	for (const std::unique_ptr<PlayerBullet>& bullets : playerBullets) {
 		colliders_.push_back(bullets.get());
@@ -266,6 +277,76 @@ void GameScene::CheckAllCollisions(){
 			CheckOnCollisions(a, b);
 
 		}
+	}
+}
+
+void GameScene::LoadEnemyPopDate(){
+	//ファイルを開く
+	std::ifstream file;
+	file.open("Resources/EnemySpone.csv");
+	assert(file.is_open());
+
+	//ファイルの内容を文字列ストリームにコピー
+	enemyPopCommands << file.rdbuf();
+
+	//ファイルを閉じる
+	file.close();
+}
+
+void GameScene::UpdateEnemyPopCommands(){
+	//待機処理
+	if (waitflag) {
+		waitTimer--;
+		if (waitTimer <= 0)	waitflag = false;
+		return;
+	}
+
+	//1行分の文字列を入れる関数
+	std::string line;
+	//コマンド実行ループ
+	while (std::getline(enemyPopCommands,line)){
+		//1行文の文字列をストリームに変換して解析しやすくする
+		std::istringstream line_stream(line);
+
+		std::string word;
+		//,区切りで行の先頭文字列を取得する
+		std::getline(line_stream, word, ',');
+
+		//"//"から始まる行はコメント
+		if (word.find("//") == 0) {
+			//コメントを行から飛ばす
+			continue;
+		}
+		if (word.find("POP") == 0) {
+			//ｘ座標
+			std::getline(line_stream, word, ',');
+			float x = (float)std::atof(word.c_str());
+			//y座標
+			std::getline(line_stream, word, ',');
+			float y = (float)std::atof(word.c_str());
+			//z座標
+			std::getline(line_stream, word, ',');
+			float z = (float)std::atof(word.c_str());
+			//敵を発生させる
+			std::unique_ptr<Enemy> enemy = nullptr;
+			enemy = std::make_unique<Enemy>();//エネミーの生成
+			enemy->Initialize(model_,Vector3(x,y,z));//エネミーの初期化
+			enemy->SetPlayer(player_.get());
+
+			enemys_.push_back(std::move(enemy));
+		}
+		else if (word.find("WAIT") == 0) {
+			//待ち時間
+			int32_t waitTime = atoi(word.c_str());
+
+			//待ち時間
+			waitflag = true;
+			waitTimer = waitTime;
+
+			//コマンドループを抜ける
+			break;
+		}
+
 	}
 }
 
